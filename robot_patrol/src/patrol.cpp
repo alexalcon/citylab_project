@@ -22,23 +22,21 @@ private:
 
     // main logic - 'scanCallback' method 
     void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser_data) {
-        // initial members setup to catch the largest range value from the laser 
-        //-----------------------------------------------------------------------
         // total number of samples (720 readings)
-        const int size = laser_data->ranges.size();
-        RCLCPP_INFO(this->get_logger(), "%d", size);
-        
-        // int min_index = -1;
-        
-        // // returns the positive infinity value of the given floating-point type
-        // float min_range =  std::numeric_limits<float>::infinity();  
-        //-----------------------------------------------------------------------
+        // const int size = laser_data->ranges.size();
+        // RCLCPP_INFO(this->get_logger(), "%d", size);
 
-    // for(int i = 0 ; size / 2 ; i++) { // only front 180 degrees
-    //         if () {
-    //         }
-    //     }
-        
+        // define the indices for -π/2 and π/2
+        // index = (angle [°] + 180°) / (angle_increment [°])
+        const int start_index = 180;
+        const int end_index = 540;
+
+        // loop through the relevant part of the ranges array
+        for (int i = start_index; i <= end_index; ++i) {
+            float range = laser_data->ranges[i];
+            // process the range data
+            RCLCPP_INFO(this->get_logger(), "Range at index %d: %f", i, range);
+        }
     }
 
 // laser sub and velocity pub node interface
