@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 project(robot_patrol)
 
-# Default to C99
+# default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 
-# Default to C++14
+# default to C++14
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
@@ -22,6 +22,33 @@ find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+
+###########
+## Build ##
+###########
+
+add_executable(patrol_node src/patrol.cpp)
+ament_target_dependencies(patrol_node rclcpp std_msgs nav_msgs geometry_msgs sensor_msgs)
+
+#############
+## Install ##
+#############
+
+# install target dependencies
+install (TARGETS
+		 patrol_node
+		 DESTINATION  lib/${PROJECT_NAME}
+)
+
+# install launch files
+install(DIRECTORY
+		launch
+		DESTINATION share/${PROJECT_NAME}
+)
+
+#############
+## Testing ##
+#############
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
