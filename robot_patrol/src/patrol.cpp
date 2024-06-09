@@ -20,8 +20,15 @@ private:
     // laser scan subscriber members setup
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_subscriber_;
     std::string laser_topic = "scan";
+    
+    // vel publisher members setup
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
 
-    // main logic - 'scanCallback' method 
+    // angular orientation (direction) to move the robot
+    float direction_;
+
+    // main logic - 'scanCallback' method - find the safest direction to move
     void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser_data) {
         // total number of samples (720 readings)
         // const int size = laser_data->ranges.size();
@@ -56,21 +63,33 @@ private:
             }
 
             // calulate the angle corresponding to the max_index
-            float max_angle = laser_data->angle_min + (max_index * laser_data->angle_increment);   
+            this->direction_ = laser_data->angle_min + (max_index * laser_data->angle_increment);   
 
-            RCLCPP_INFO(this->get_logger(), "Max distance: %f at angle: %f radians", max_distance, max_angle);
+            RCLCPP_INFO(this->get_logger(), "Max distance: %f [m] at angle: %f [rad]", max_distance, this->direction_);
         }
+    }
+
+    // publish velocities to move the robot 
+    void velocityControlLoop() {
+        auto vel_data = geometry_msgs::msg::Twist();
+        vel_data.linear.x = 0.1;                   // constant linear velocity in x
+        vel_data.angular.z = this->direction_ / 2; // angular velocity in z
+
+        velocity_publisher_->publish(vel_data);
     }
 
 // laser sub and velocity pub node interface
 // constructor
 public:
-    Patrol() : Node("patrol") {
+    Patrol() : Node("robot_patrol") {
         laser_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>(this->laser_topic, 
                                                                                          10,
                                                                                          std::bind(&Patrol::laserCallback, 
                                                                                                    this, 
                                                                                                    std::placeholders::_1));
+
+        velocity_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
+        timer_ = this->create_wall_timer(100ms, std::bind(&Patrol::velocityControlLoop, this));
     }
 };
 
