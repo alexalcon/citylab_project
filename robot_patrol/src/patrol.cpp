@@ -8,6 +8,7 @@
 #include <string>
 #include <chrono>
 #include <functional>
+#include <limits>
 
 using namespace std::chrono_literals;
 
@@ -25,17 +26,39 @@ private:
         // total number of samples (720 readings)
         // const int size = laser_data->ranges.size();
         // RCLCPP_INFO(this->get_logger(), "%d", size);
-
-        // define the indices for -π/2 and π/2
+        
+        // define the ranges indices for -π/2 and π/2
         // index = (angle [°] + 180°) / (angle_increment [°])
         const int start_index = 180;
         const int end_index = 540;
 
+        // initialize variables to track the maximum distance and its index
+        /**
+         * - 'max_distance' is initialized to negative inf to ensure any 
+         *   valid distance will be larger
+         *      'std::numeric_limits<float>::infinity()' returns the 
+         *      positive infinity value of the given floating-point type
+         * 
+         * - 'max_index' is initialized to start_index as a placeholder
+         */ 
+        float max_distance = -std::numeric_limits<float>::infinity();
+        int max_index = start_index;
+
+        // read laser data between -pi/2 to pi/2
         // loop through the relevant part of the ranges array
-        for (int i = start_index; i <= end_index; ++i) {
+        for (int i = start_index; i <= end_index; ++i) { // only front 180 degrees
             float range = laser_data->ranges[i];
-            // process the range data
-            RCLCPP_INFO(this->get_logger(), "Range at index %d: %f", i, range);
+            
+            // ensuring range is between -inf and +inf
+            if (range < std::numeric_limits<float>::infinity() && range > max_distance) {
+                max_distance = range;
+                max_index = i;
+            }
+
+            // calulate the angle corresponding to the max_index
+            float max_angle = laser_data->angle_min + (max_index * laser_data->angle_increment);   
+
+            RCLCPP_INFO(this->get_logger(), "Max distance: %f at angle: %f radians", max_distance, max_angle);
         }
     }
 
