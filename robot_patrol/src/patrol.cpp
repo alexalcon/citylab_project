@@ -69,15 +69,13 @@ private:
             // non-exclusive conditionals to get the max and min distances and ranges indices
             //------------------------------------------------------------------------------------------------- 
             // ensuring range is between -inf and +inf and getting the max distance and index
-            if (current_range < std::numeric_limits<float>::infinity() && current_range > max_distance) {
+            if ( current_range < std::numeric_limits<float>::infinity() && current_range > max_distance ) {
                 max_distance = current_range;
                 max_index = i;
             }
-            // reading from -55° (index 250) to 55° (index 470) xor 
-            //              -80° (index 200) to -90° (index 180) xor
-            //               80° (index 520) to 90° (index 540) xor
+            // reading from -15° (index 250) to 15° (index 470)
             // in order to get the min distance
-            if ( (i >= 250 && i <= 470) ^ (i >= 180 && i <= 200) ^ (i >= 520 && i <= 540) ) {
+            if ( i >= 330 && i <= 390 ) {
                 if (current_range < std::numeric_limits<float>::infinity() && current_range < min_distance) {
                     min_distance = current_range;
                     min_index = i;
@@ -97,26 +95,24 @@ private:
     geometry_msgs::msg::Twist calculateVelocity(float max_distance, float min_distance, float angle, int min_index) {
         auto velocity = geometry_msgs::msg::Twist();
 
-        // if the min distance is close to an obstacle in the robot's front or 
-        // sides then turn right or left according the obstacle presence, i.e, 
-        // if there is an obstacle to the robot's right side then turn left and
-        // if there is an obstacle to the robot's left side then turn right        
+        // if the min distance is closer than 35 cm to an obstacle in the robot's 
+        // front then turn right or left according the max distance direction (angle)
         // 0.11999999731779099 is laser scan's range_min parameter value  
-        if (min_distance > 0.11999999731779099 && min_distance < (0.11999999731779099 + 0.11999999731779099*0.80)) {
-            if ( (min_index >= 250 && min_index < 360) || (min_index >= 180 && min_index <= 200) ) { // right obstacle 
+        if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*1.90) ) ) {
+            if ( ( angle > 0 ) || ( min_index >= 330 && min_index < 360 ) ) {
                 velocity.linear.x = 0;
-                velocity.angular.z = 0.5;
-                std::cout << "min_distace: " << min_distance << std::endl; 
+                velocity.angular.z = 0.7;
+                std::cout << "min_distace: " << min_distance << " " << velocity.angular.z << " " << angle << std::endl; 
             }
-            else if ( (min_index > 250 && min_index <= 470) || (min_index >= 520 && min_index <= 540) ) { // left obstacle
+            else if ( ( angle < 0 ) || ( min_index > 360 && min_index <= 390 ) ) {
                 velocity.linear.x = 0;
-                velocity.angular.z = -0.5;
-                std::cout << "min_distace: " << min_distance << std::endl; 
+                velocity.angular.z = -0.7;
+                std::cout << "min_distace: " << min_distance << " " << velocity.angular.z << " " << angle << std::endl; 
             }
         } 
-        else { // if there is no close obstacle then move to the max distance direction 
+        else { // if there is no close obstacle then move forward
             velocity.linear.x = 0.1;
-            velocity.angular.z = angle/2;
+            velocity.angular.z = 0.0;
             std::cout << "max distace: " << max_distance << std::endl; 
         }
 
