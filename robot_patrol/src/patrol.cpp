@@ -102,7 +102,7 @@ private:
         // if there is an obstacle to the robot's right side then turn left and
         // if there is an obstacle to the robot's left side then turn right        
         // 0.11999999731779099 is laser scan's range_min parameter value  
-        if (min_distance > 0.11999999731779099 && min_distance < (0.11999999731779099 + 0.11999999731779099*0.55)) {
+        if (min_distance > 0.11999999731779099 && min_distance < (0.11999999731779099 + 0.11999999731779099*0.80)) {
             if ( (min_index >= 250 && min_index < 360) || (min_index >= 180 && min_index <= 200) ) { // right obstacle 
                 velocity.linear.x = 0;
                 velocity.angular.z = 0.5;
