@@ -24,6 +24,7 @@ find_package(action_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(get_direction_interface REQUIRED)
 
 ###########
 ## Build ##
@@ -33,7 +34,13 @@ add_executable(patrol_node src/patrol.cpp)
 ament_target_dependencies(patrol_node rclcpp std_msgs nav_msgs geometry_msgs sensor_msgs)
 
 add_executable(direction_service_node src/direction_service.cpp)
-ament_target_dependencies(direction_service_node rclcpp std_msgs std_srvs action_msgs nav_msgs geometry_msgs sensor_msgs)
+ament_target_dependencies(direction_service_node rclcpp 
+												 std_msgs 
+												 std_srvs 
+												 action_msgs 
+												 nav_msgs geometry_msgs 
+												 sensor_msgs 
+												 get_direction_interface)
 
 #############
 ## Install ##

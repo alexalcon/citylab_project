@@ -37,7 +37,7 @@ private:
     void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser_data) {
         // define the indices for -π/2 and π/2
         /**
-         * Formula to get the right indices
+         * Formula to get the angle indices
          *      index = (angle [°] + 180°) / (angle_increment [°])
          *      e.g.:
          *          For -90°: (-90° + 180) / (0.5°) = 180 
