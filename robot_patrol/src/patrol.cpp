@@ -33,7 +33,7 @@ private:
     float direction_; // angular orientation (direction) to move the robot
     geometry_msgs::msg::Twist vel_data; 
 
-    // logic to get needed laser scan data - 'scanCallback' method 
+    // logic to get needed laser scan data - 'laserCallback' method 
     void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser_data) {
         // define the indices for -π/2 and π/2
         /**
@@ -68,12 +68,13 @@ private:
 
             // non-exclusive conditionals to get the max and min distances and ranges indices
             //------------------------------------------------------------------------------------------------- 
-            // ensuring range is between -inf and +inf and getting the max distance and index
+            // ensuring range is between -inf and +inf, first, then between max_distance and +inf   
+            // hence, getting the max distance and index
             if ( current_range < std::numeric_limits<float>::infinity() && current_range > max_distance ) {
                 max_distance = current_range;
                 max_index = i;
             }
-            // reading from -15° (index 250) to 15° (index 470)
+            // reading from -15° (index 330) to 15° (index 390)
             // in order to get the min distance
             if ( i >= 330 && i <= 390 ) {
                 if (current_range < std::numeric_limits<float>::infinity() && current_range < min_distance) {
@@ -99,12 +100,12 @@ private:
         // front then turn right or left according the max distance direction (angle)
         // 0.11999999731779099 is laser scan's range_min parameter value  
         if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*1.90) ) ) {
-            if ( ( angle > 0 ) || ( min_index >= 330 && min_index < 360 ) ) {
+            if ( ( angle > 0 ) || ( min_index >= 330 && min_index < 360 ) ) { // counterclockwise rotation
                 velocity.linear.x = 0;
                 velocity.angular.z = 0.7;
                 std::cout << "min_distace: " << min_distance << " " << velocity.angular.z << " " << angle << std::endl; 
             }
-            else if ( ( angle < 0 ) || ( min_index > 360 && min_index <= 390 ) ) {
+            else if ( ( angle < 0 ) || ( min_index > 360 && min_index <= 390 ) ) { // clockwise rotation
                 velocity.linear.x = 0;
                 velocity.angular.z = -0.7;
                 std::cout << "min_distace: " << min_distance << " " << velocity.angular.z << " " << angle << std::endl; 
