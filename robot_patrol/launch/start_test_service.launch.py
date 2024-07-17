@@ -5,7 +5,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='robot_patrol',
-            executable='direction_service_node',
+            executable='test_service_node',
             output='screen',
             emulate_tty=True)
     ])

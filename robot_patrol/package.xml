@@ -18,7 +18,7 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>get_direction</depend>
+  <depend>get_direction_interface</depend>
   <!-- ********************************************************* -->  
 
   <test_depend>ament_lint_auto</test_depend>
