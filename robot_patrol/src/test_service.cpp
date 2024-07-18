@@ -5,7 +5,7 @@
 using GetDirection = get_direction_interface::srv::GetDirection;
 using std::placeholders::_1;
 
-// 'DirectionService' class service server inherits from 'rclcpp::Node'
+// 'TestClient' class service client inherits from 'rclcpp::Node'
 // making it a ROS2 (service client) node
 /*
  * This service client (test) node:
@@ -17,7 +17,7 @@ using std::placeholders::_1;
 class TestClient : public rclcpp::Node {
 public:
     TestClient() : Node("test_direction_service_node") {     
-        // subscriber members initialization
+        // laser scan subscriber members initialization
         rclcpp::SubscriptionOptions sub_thread;
         sub_thread.callback_group = create_callback_group(rclcpp::CallbackGroupType::Reentrant);
         sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
@@ -59,6 +59,8 @@ private:
             auto response = fut.get();
             RCLCPP_INFO(this->get_logger(), "Service was called.");
             RCLCPP_INFO(this->get_logger(), "Recevied direction: %s", response->direction.c_str());
+            RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
+            RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
         }
         else {
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service.");
@@ -66,7 +68,7 @@ private:
     }
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<TestClient>());
     rclcpp::shutdown();
