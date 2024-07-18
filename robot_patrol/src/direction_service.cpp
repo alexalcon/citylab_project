@@ -7,7 +7,13 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 // 'DirectionService' class service server inherits from 'rclcpp::Node'
-// making it a ROS2 node
+// making it a ROS2 (service server) node
+/*
+ * This service server node:
+ *
+ *      Performs the main obstacle avoidance logic (decision-making algorithm)
+ *      for the robot to patrol autonomously in a "citylab" environment. 
+ */
 class DirectionService : public rclcpp::Node {
 public:
     DirectionService() : Node("direction_service_node") {
@@ -19,21 +25,22 @@ public:
   }
 
 private:
+    rclcpp::CallbackGroup::SharedPtr callback_group_;
     rclcpp::Service<get_direction_interface::srv::GetDirection>::SharedPtr service_;
 
+    // main obstacle avoidance logic (decision-making algorithm)
+    // service server callback function
     void getDirection(
         const std::shared_ptr<GetDirection::Request> request,
         const std::shared_ptr<GetDirection::Response> response) {
     
-        // analyze the laser data here
-        // for simplicity, let's assume laser data is divided and processed here
+        // required data members to analyze the laser data
         float total_dist_sec_right = 0, total_dist_sec_front = 0, total_dist_sec_left = 0;
         int count_right = 0, count_front = 0, count_left = 0;
-
         
         // get the indices for the three sections
         /**
-        * Formula to get the angle indices
+        * Formula to get the angle indices:
         *      index = (angle [°] + 180°) / (angle_increment [°])
         *      e.g.:
         *          For -90°: (-90° + 180) / (0.5°) = 180 
@@ -63,24 +70,6 @@ private:
             }
         }
 
-
-
-
-
-        // for (size_t i = 0; i < request->laser_data.ranges.size(); ++i) {
-        //     float angle = request->laser_data.angle_min + i * request->laser_data.angle_increment;
-        //     if (angle >= -M_PI/6 && angle <= M_PI/6) {
-        //         total_dist_sec_front += request->laser_data.ranges[i];
-        //         ++count_front;
-        //     } else if (angle > M_PI/6 && angle <= M_PI/2) {
-        //         total_dist_sec_right += request->laser_data.ranges[i];
-        //         ++count_right;
-        //     } else if (angle >= -M_PI/2 && angle < -M_PI/6) {
-        //         total_dist_sec_left += request->laser_data.ranges[i];
-        //         ++count_left;
-        //     }
-        // }
-
         // average distances
         total_dist_sec_right /= count_right;
         total_dist_sec_front /= count_front;
@@ -101,5 +90,6 @@ int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<DirectionService>());
     rclcpp::shutdown();
+    
     return 0;
 }
