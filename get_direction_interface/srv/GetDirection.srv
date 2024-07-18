@@ -1,3 +1,5 @@
 sensor_msgs/LaserScan laser_data
 ---
 string direction
+float32 min_distance
+int32 min_index
