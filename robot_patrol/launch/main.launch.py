@@ -15,5 +15,5 @@ def generate_launch_description():
             executable ='patrol_with_service_node',
             output ='screen',
             emulate_tty=True
-        ),
+        )
     ])

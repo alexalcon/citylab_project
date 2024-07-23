@@ -5,7 +5,7 @@
 using GetDirection = get_direction_interface::srv::GetDirection;
 using std::placeholders::_1;
 
-// 'DirectionService' class service server inherits from 'rclcpp::Node'
+// 'TestClient' class service client inherits from 'rclcpp::Node'
 // making it a ROS2 (service client) node
 /*
  * This service client (test) node:
@@ -15,9 +15,11 @@ using std::placeholders::_1;
  *      the service 'direction_service' from ./direction_service.cpp 
  */
 class TestClient : public rclcpp::Node {
+// laser scan subscriber and service client node interface
+// class node constructor
 public:
     TestClient() : Node("test_direction_service_node") {     
-        // subscriber members initialization
+        // laser scan subscriber members initialization
         rclcpp::SubscriptionOptions sub_thread;
         sub_thread.callback_group = create_callback_group(rclcpp::CallbackGroupType::Reentrant);
         sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
@@ -27,7 +29,7 @@ public:
             sub_thread);
         
         // service client initialization
-        //------------------------------------------------------------------
+        //---------------------------------------------------------------------
         client_ = this->create_client<GetDirection>("/direction_service");      
 
         // check if the service server is available or not 
@@ -40,9 +42,11 @@ public:
             RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
                 "Service not available, waiting again...");
         }
-        //------------------------------------------------------------------
+        //---------------------------------------------------------------------
     }
 
+
+// laser scan subscriber and service client node implementation details
 private:
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_;
     rclcpp::Client<GetDirection>::SharedPtr client_;
@@ -59,6 +63,8 @@ private:
             auto response = fut.get();
             RCLCPP_INFO(this->get_logger(), "Service was called.");
             RCLCPP_INFO(this->get_logger(), "Recevied direction: %s", response->direction.c_str());
+            RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
+            RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
         }
         else {
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service.");
@@ -66,7 +72,7 @@ private:
     }
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<TestClient>());
     rclcpp::shutdown();

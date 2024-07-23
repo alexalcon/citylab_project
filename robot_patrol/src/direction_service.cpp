@@ -25,8 +25,7 @@ public:
   }
 
 private:
-    rclcpp::CallbackGroup::SharedPtr callback_group_;
-    rclcpp::Service<get_direction_interface::srv::GetDirection>::SharedPtr service_;
+    rclcpp::Service<GetDirection>::SharedPtr service_;
 
     // main obstacle avoidance logic (decision-making algorithm)
     // service server callback function
@@ -34,7 +33,7 @@ private:
         const std::shared_ptr<GetDirection::Request> request,
         const std::shared_ptr<GetDirection::Response> response) {
     
-        // required data members to analyze the laser data
+        // required variables to analyze the laser data
         float total_dist_sec_right = 0, total_dist_sec_front = 0, total_dist_sec_left = 0;
         int count_right = 0, count_front = 0, count_left = 0;
         
@@ -51,21 +50,40 @@ private:
         int end_front_index = 420;   // index for 30°
         int end_left_index = 540;    // index for 90°
 
+        // variables to grab additional laser data in order to
+        // fine tune the obstacle avoidance algorithm (logic) 
+        float min_distance = std::numeric_limits<float>::infinity();
+        int min_index = end_left_index;
+
+        // current laser data
         auto laser_data = request->laser_data;
 
         // logic to analyze/process the laser scan data
         // loop through the relevant part of the ranges array (front -π to π)
-        for (int i = start_right_index; i <= end_left_index; ++i) {
-            if (i >= start_right_index && i < end_right_index) {    // right section
-                total_dist_sec_right += laser_data.ranges[i];
+        for ( int i = start_right_index; i <= end_left_index; ++i ) {
+            float current_range = laser_data.ranges[i];
+            
+            // non-exclusive conditional
+            // reading from -15° (index 330) to 15° (index 390)
+            // in order to get the min distance
+            if ( i >= 330 && i <= 390 ) {
+                if ( current_range < std::numeric_limits<float>::infinity() && current_range < min_distance ) {
+                    min_distance = current_range;
+                    min_index = i;
+                }
+            }
+
+            // exclusive conditionals
+            if ( i >= start_right_index && i < end_right_index ) {    // right section
+                total_dist_sec_right += current_range;
                 ++count_right;
             }
-            else if (i >= end_right_index && i < end_front_index) { // front section
-                total_dist_sec_front += laser_data.ranges[i];
+            else if ( i >= end_right_index && i < end_front_index ) { // front section
+                total_dist_sec_front += current_range;
                 ++count_front;
             }
-            else if (i >= end_front_index && i < end_left_index) {  // left section
-                total_dist_sec_left += laser_data.ranges[i];
+            else if ( i >= end_front_index && i < end_left_index ) {  // left section
+                total_dist_sec_left += current_range;
                 ++count_left;
             }
         }
@@ -83,6 +101,11 @@ private:
         } else {
             response->direction = "right";
         }
+
+        // send, as part of the service response, the 
+        // min distance and min index laser data
+        response->min_distance = min_distance;
+        response->min_index = min_index;
     }
 };
 
