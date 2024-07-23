@@ -15,6 +15,8 @@ using std::placeholders::_1;
  *      the service 'direction_service' from ./direction_service.cpp 
  */
 class TestClient : public rclcpp::Node {
+// laser scan subscriber and service client node interface
+// class node constructor
 public:
     TestClient() : Node("test_direction_service_node") {     
         // laser scan subscriber members initialization
@@ -27,7 +29,7 @@ public:
             sub_thread);
         
         // service client initialization
-        //------------------------------------------------------------------
+        //---------------------------------------------------------------------
         client_ = this->create_client<GetDirection>("/direction_service");      
 
         // check if the service server is available or not 
@@ -40,9 +42,11 @@ public:
             RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
                 "Service not available, waiting again...");
         }
-        //------------------------------------------------------------------
+        //---------------------------------------------------------------------
     }
 
+
+// laser scan subscriber and service client node implementation details
 private:
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_;
     rclcpp::Client<GetDirection>::SharedPtr client_;
