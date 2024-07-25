@@ -66,17 +66,28 @@ ament_target_dependencies(patrol_with_service_node
 	sensor_msgs 
 	get_direction_interface)
 
+add_executable(go_to_pose_node src/go_to_pose_action.cpp)
+ament_target_dependencies(go_to_pose_node 
+	rclcpp 
+	std_msgs 
+	std_srvs 
+	action_msgs 
+	nav_msgs 
+	geometry_msgs 
+	get_direction_interface)
+
 #############
 ## Install ##
 #############
 
 # install target dependencies
 install(TARGETS
-		 patrol_node
-		 direction_service_node
-		 test_service_node
-		 patrol_with_service_node
-		 DESTINATION  lib/${PROJECT_NAME}
+		patrol_node
+		direction_service_node
+		test_service_node
+		patrol_with_service_node
+		go_to_pose_node
+		DESTINATION  lib/${PROJECT_NAME}
 )
 
 # install launch files
