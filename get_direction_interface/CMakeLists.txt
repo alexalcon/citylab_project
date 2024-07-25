@@ -31,6 +31,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetDirection.srv"
+  "action/GoToPose.action"
 
    # remember to add it when you use other dependency in the file	
    DEPENDENCIES std_msgs std_srvs action_msgs sensor_msgs geometry_msgs  
