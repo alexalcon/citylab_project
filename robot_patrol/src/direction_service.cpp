@@ -17,6 +17,7 @@ using std::placeholders::_2;
 class DirectionService : public rclcpp::Node {
 public:
     DirectionService() : Node("direction_service_node") {
+        // service server initialization
         service_ = this->create_service<GetDirection>(
             "direction_service", 
             std::bind(&DirectionService::getDirection, this, _1, _2));
