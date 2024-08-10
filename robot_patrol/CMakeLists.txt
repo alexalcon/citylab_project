@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(action_msgs REQUIRED)
@@ -42,7 +43,8 @@ ament_target_dependencies(direction_service_node
 	nav_msgs 
 	geometry_msgs 
 	sensor_msgs 
-	get_direction_interface)
+	get_direction_interface
+	)
 
 add_executable(test_service_node src/test_service.cpp)
 ament_target_dependencies(test_service_node 
@@ -69,6 +71,17 @@ ament_target_dependencies(patrol_with_service_node
 add_executable(go_to_pose_node src/go_to_pose_action.cpp)
 ament_target_dependencies(go_to_pose_node 
 	rclcpp 
+	rclcpp_action
+	std_msgs 
+	std_srvs 
+	action_msgs 
+	nav_msgs 
+	geometry_msgs 
+	get_direction_interface)
+
+add_executable(odom_sub_test_node src/odom_sub_test.cpp)
+ament_target_dependencies(odom_sub_test_node 
+	rclcpp 
 	std_msgs 
 	std_srvs 
 	action_msgs 
@@ -87,6 +100,7 @@ install(TARGETS
 		test_service_node
 		patrol_with_service_node
 		go_to_pose_node
+		odom_sub_test_node
 		DESTINATION  lib/${PROJECT_NAME}
 )
 
