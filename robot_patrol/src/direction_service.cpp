@@ -67,7 +67,7 @@ private:
             // non-exclusive conditional
             // reading from -15° (index 330) to 15° (index 390)
             // in order to get the min distance
-            if ( i >= 330 && i <= 390 ) {
+            if ( i >= 270 && i <= 450 ) {
                 if ( current_range < std::numeric_limits<float>::infinity() && current_range < min_distance ) {
                     min_distance = current_range;
                     min_index = i;
