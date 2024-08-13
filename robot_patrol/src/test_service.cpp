@@ -63,8 +63,8 @@ private:
             auto response = fut.get();
             RCLCPP_INFO(this->get_logger(), "Service was called.");
             RCLCPP_INFO(this->get_logger(), "Recevied direction: %s", response->direction.c_str());
-            RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
-            RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
+            // RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
+            // RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
         }
         else {
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service.");

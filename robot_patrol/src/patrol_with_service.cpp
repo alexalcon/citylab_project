@@ -105,8 +105,8 @@ private:
             auto response = fut.get();
             RCLCPP_INFO(this->get_logger(), "Service was called.");
             RCLCPP_INFO(this->get_logger(), "Recevied direction: %s", response->direction.c_str());
-            RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
-            RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
+            // RCLCPP_INFO(this->get_logger(), "Recevied min distance: %f", response->min_distance);
+            // RCLCPP_INFO(this->get_logger(), "Recevied min index: %d", response->min_index);
             vel_data = this->calculateVelocity(response->direction, response->min_distance, response->min_index);
         }
         else {
@@ -121,20 +121,20 @@ private:
         // if the min distance is closer than 35 cm to an obstacle in the robot's 
         // front then turn right or left according the max distance direction
         // 0.11999999731779099 is laser scan's range_min parameter value  
-        if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*0.70) ) ) {
+        if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*1.50) ) ) { // 0.70
             if ( ( min_index >= 270 && min_index < 360 ) ) { // counterclockwise rotation
                 velocity.linear.x = 0;
-                velocity.angular.z = 1.5;
+                velocity.angular.z = 1.5; // 1.5
             }
             else if ( ( min_index > 360 && min_index <= 450 ) ) { // clockwise rotation
                 velocity.linear.x = 0;
-                velocity.angular.z = -1.5;
+                velocity.angular.z = -1.5; // 1.5
             }
         } 
         else { // if there is no close obstacle then perform the server obstacle avoidance logic 
              if (direction == "right") {
                 velocity.linear.x = 0.1;
-                velocity.angular.z = -0.5;   
+                velocity.angular.z = 0.5;   
             } 
             else if(direction == "front") {
                 velocity.linear.x = 0.1;
@@ -142,7 +142,7 @@ private:
             }
             else {
                 velocity.linear.x = 0.1;
-                velocity.angular.z = 0.5;   
+                velocity.angular.z = -0.5;   
             }
         }
 

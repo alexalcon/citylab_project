@@ -95,12 +95,21 @@ private:
         total_dist_sec_left /= count_left;
 
         // decide direction based on distances
-        if (total_dist_sec_front > total_dist_sec_left && total_dist_sec_front > total_dist_sec_right) {
+        // if (total_dist_sec_front > total_dist_sec_left && total_dist_sec_front > total_dist_sec_right) {
+        //     response->direction = "forward";
+        // } else if (total_dist_sec_left > total_dist_sec_right) {
+        //     response->direction = "left";
+        // } else {
+        //     response->direction = "right";
+        // }
+
+        // determine the middle number
+        if ((total_dist_sec_front > total_dist_sec_right && total_dist_sec_front < total_dist_sec_left) || (total_dist_sec_front < total_dist_sec_right && total_dist_sec_front > total_dist_sec_left)) {
             response->direction = "forward";
-        } else if (total_dist_sec_left > total_dist_sec_right) {
-            response->direction = "left";
-        } else {
+        } else if ((total_dist_sec_right > total_dist_sec_front && total_dist_sec_right < total_dist_sec_left) || (total_dist_sec_right < total_dist_sec_front && total_dist_sec_right > total_dist_sec_left)) {
             response->direction = "right";
+        } else {
+            response->direction = "left";
         }
 
         // send, as part of the service response, the 
