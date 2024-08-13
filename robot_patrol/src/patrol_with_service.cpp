@@ -121,7 +121,7 @@ private:
         // if the min distance is closer than 35 cm to an obstacle in the robot's 
         // front then turn right or left according the max distance direction
         // 0.11999999731779099 is laser scan's range_min parameter value  
-        if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*1.90) ) ) {
+        if ( ( min_distance > 0.11999999731779099 ) && ( min_distance < (0.11999999731779099 + 0.11999999731779099*0.70) ) ) {
             if ( ( min_index >= 270 && min_index < 360 ) ) { // counterclockwise rotation
                 velocity.linear.x = 0;
                 velocity.angular.z = 1.5;
