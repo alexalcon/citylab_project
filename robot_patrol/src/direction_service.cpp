@@ -103,7 +103,7 @@ private:
         //     response->direction = "right";
         // }
 
-        // determine the middle number
+        // determine the middle distance
         if ((total_dist_sec_front > total_dist_sec_right && total_dist_sec_front < total_dist_sec_left) || (total_dist_sec_front < total_dist_sec_right && total_dist_sec_front > total_dist_sec_left)) {
             response->direction = "forward";
         } else if ((total_dist_sec_right > total_dist_sec_front && total_dist_sec_right < total_dist_sec_left) || (total_dist_sec_right < total_dist_sec_front && total_dist_sec_right > total_dist_sec_left)) {
