@@ -126,7 +126,7 @@ private:
     }
 
 // laser sub and velocity pub node interface
-// constructor
+// class node constructor
 public:
     Patrol() : Node("patrol") {
         callback_group_1= this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);

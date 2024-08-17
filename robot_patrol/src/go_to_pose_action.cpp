@@ -1,4 +1,3 @@
-#include <functional>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose2_d.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -7,16 +6,13 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <action_msgs/msg/goal_status_array.hpp>
 #include <action_msgs/srv/cancel_goal.hpp>
-#include "rclcpp/callback_group.hpp"
-#include "rclcpp/executors/multi_threaded_executor.hpp"
-#include "rclcpp/subscription_options.hpp"
 #include "rclcpp/timer.hpp"
-#include "rclcpp/utilities.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "get_direction_interface/action/go_to_pose.hpp"
 
 #include <iostream>
 #include <chrono>
+#include <functional>
 
 using namespace std::chrono_literals;
 
@@ -149,8 +145,8 @@ private:
 
                 bool flag = true;
                 while (flag) {
-                    if ( (current_pos_.theta > (desired_pos_.theta + desired_pos_.theta*(-0.01))) && 
-                         (current_pos_.theta < (desired_pos_.theta + desired_pos_.theta*0.01)) ) { 
+                    if ( ( (current_pos_.theta > (desired_pos_.theta + desired_pos_.theta*(-0.1))) && 
+                           (current_pos_.theta < (desired_pos_.theta + desired_pos_.theta*0.1)) ) ) { 
                         
                         vel_data.linear.x = 0.0;
                         vel_data.angular.z = 0.0;
@@ -160,7 +156,7 @@ private:
 
                         flag = false;
                     }
-                    else {
+                    else {  
                         vel_data.linear.x = 0.0;
                         vel_data.angular.z = 0.7;
                 

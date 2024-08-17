@@ -65,7 +65,7 @@ private:
             float current_range = laser_data.ranges[i];
             
             // non-exclusive conditional
-            // reading from -15° (index 330) to 15° (index 390)
+            // reading from -45° (index 270) to 45° (index 450)
             // in order to get the min distance
             if ( i >= 270 && i <= 450 ) {
                 if ( current_range < std::numeric_limits<float>::infinity() && current_range < min_distance ) {
