@@ -121,60 +121,59 @@ private:
             double diff_x = desired_pos_.x - current_pos_.x;
             double diff_y = desired_pos_.y - current_pos_.y;
             double distance = sqrt(diff_x * diff_x + diff_y * diff_y); // euclidean distance formula
+            
+            // calculate the angle to the goal
             double angle_to_goal = atan2(diff_y, diff_x);
-            double angle_diff = (angle_to_goal * 180.0 / M_PI) - current_pos_.theta; // degrees
-            // std::cout << "desired angle: " << desired_pos_.theta << std::endl;
-            // std::cout << "diff_x: " << diff_x << " - diff_y: " << diff_y << std::endl;
-            // std::cout << "angle_to_goal: " << angle_to_goal * 180.0 / M_PI << " - angle_diff: " << angle_diff << std::endl;
+            double angle_diff = normalize_angle(angle_to_goal - current_pos_.theta * M_PI / 180.0);
+
             
             // decision making algorithm logic
             // to publish velocity commands
             if (distance > 0.05) {                                   
                 vel_data.linear.x = 0.2;                          // fixed linear velocity
-                vel_data.angular.z = (angle_diff * M_PI / 180.0); // adjust angular velocity (radian values)
+                vel_data.angular.z = angle_diff;                  // adjust angular velocity proportionally
 
                 feedback->current_pos = current_pos_; // action feedback data
                 goal_handle->publish_feedback(feedback);
 
             } else {
                 vel_data.linear.x = 0.0;
-                vel_data.angular.z = 0.0;
-                
-                feedback->current_pos = current_pos_;  // action feedback data
-                goal_handle->publish_feedback(feedback);
 
-                bool flag = true;
-                while (flag) {
-                    if ( ( (current_pos_.theta > (desired_pos_.theta + desired_pos_.theta*(-0.1))) && 
-                           (current_pos_.theta < (desired_pos_.theta + desired_pos_.theta*0.1)) ) ) { 
-                        
-                        vel_data.linear.x = 0.0;
-                        vel_data.angular.z = 0.0;
-                
-                        feedback->current_pos = current_pos_;  // action feedback data
-                        goal_handle->publish_feedback(feedback);
+                // normalize the desired orientation
+                double desired_theta_rad = desired_pos_.theta * M_PI / 180.0;
+                double current_theta_rad = current_pos_.theta * M_PI / 180.0;
+                double theta_diff = normalize_angle(desired_theta_rad - current_theta_rad);
 
-                        flag = false;
-                    }
-                    else {  
-                        vel_data.linear.x = 0.0;
-                        vel_data.angular.z = 0.7;
-                
-                        feedback->current_pos = current_pos_;  // action feedback data
-                        goal_handle->publish_feedback(feedback);
-                    }
+                if (fabs(theta_diff) > 0.01) {
+                    // Use proportional control for angular velocity
+                    vel_data.angular.z = theta_diff * 0.5; // Adjust the gain as needed
+                } else {
+                    vel_data.angular.z = 0.0;
+                    
+                    feedback->current_pos = current_pos_;
+                    goal_handle->publish_feedback(feedback);
+
+                    result->status = true;
+                    goal_handle->succeed(result);
+                    RCLCPP_INFO(this->get_logger(), "Goal succeeded.");
+                    break;
                 }
 
-                result->status = true;    
-                goal_handle->succeed(result);
-                RCLCPP_INFO(this->get_logger(), "Goal succeeded.");
-                break;
+                feedback->current_pos = current_pos_;
+                goal_handle->publish_feedback(feedback);
+               
             }
 
             loop_rate.sleep();
         }
     }
     //-------------------------------------------------------------------------------------------
+
+    double normalize_angle(double angle) {
+        while (angle > M_PI) angle -= 2.0 * M_PI;
+        while (angle < -M_PI) angle += 2.0 * M_PI;
+        return angle;
+    }
 
     // odom sensor data acquisition and procesing 
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
